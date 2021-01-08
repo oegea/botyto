@@ -1,0 +1,32 @@
+body{
+    background-repeat: repeat-x;
+    background-image: url(/assets/img/top.png);
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
+    height: 100vh;
+    margin: 0;
+    display: none;
+}
+h1 {
+    font-family: 'Carter One', cursive; 
+    font-size: 50px;
+    font-weight: 800;
+    color: black;
+    text-align: center;
+}
+.window-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.window-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.poring{
+    margin-top: 40px;
+    margin-left: calc(50% - 37.5px);
+    max-width: 75px;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Configuration</title>
+    <link rel="stylesheet" href="styles/index.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
+  </head>
+  <body>
+    <h1>Configuration</h1>
+    
+    <input type="text" id="username" placeholder="Username"/>
+    <input type="text" id="password" placeholder="Oauth Token"/>
+    <p><a target="blank" href="https://twitchapps.com/tmi/">You can get your OAuth Token clicking here.</a></p>
+    <input type="text" id="channelName" placeholder="Channel Name"/>
+    <input type="text" id="pointName" placeholder="Points Name"/>
+    <input type="number" min="0" id="pointsPerMinute" placeholder="Points per minute"/>
+    <input type="number" min="1" id="pointsInterval" placeholder="Points interval (minutes)"/>
+    <input type="text" id="adminName" placeholder="Admin username"/>
+    <input type="text" id="donorText" placeholder="Donor text"/>
+    <input type="text" id="networkText" placeholder="Social Networks text"/>
+    <input type="number" min="0" id="hidratacionCost" placeholder="!hidratacion cost"/>
+    <input type="number" min="0" id="messageCost" placeholder="!mensaje cost"/>
+    <input type="number" min="0" id="dadoCost" placeholder="!dado cost"/>
+    <div class="buttons-wrapper">
+      <div class="button bottom-button float-left" onclick="save()">
+        Save
+      </div>
+    </div>
+    <div class="clear"></div>
+
+    <script src="js/config.js"></script>
+  </body>
+</html>

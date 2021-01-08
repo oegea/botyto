@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Botyto</title>
+    <link rel="stylesheet" href="styles/index.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
+  </head>
+  <body>
+    <img class="logo" src="img/bot-icon.jpg" />
+    <div class="button right-fixed" onclick="openConfig()">
+      Configuration
+    </div>
+    
+    <div class="terminal"></div>
+
+    <div class="buttons-wrapper">
+      <div class="button bottom-button float-left" onclick="startStopServer()">
+        Start / Stop
+      </div>
+  
+      <div class="button bottom-button float-right">
+        <a target="blank" href="http://localhost:3000/voice.html">Enable Text 2 Speech</a>
+      </div>
+    </div>
+    <div class="clear"></div>
+
+    <div class="footer">
+      Botyto is free software, written with 💛 by <a target="blank" href="https://twitch.tv/titobabydi">titobabydi</a>. <br />
+      If this software has been useful to you, please consider giving a follow to the author on Twitch.
+
+    </div>
+    <script src="js/main.js"></script>
+  </body>
+</html>

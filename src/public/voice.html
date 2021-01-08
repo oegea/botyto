@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Voice messages interface!</title>
+    </head>
+    <body>
+        <button onclick="activateMessages()">Activar mensajes de voz</button>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            let timeout;
+            var socket = io();
+
+            socket.on('saymessage', (msg)=>{
+                const synth = window.speechSynthesis;
+                const utterThis = new SpeechSynthesisUtterance(msg);
+                synth.speak(utterThis);
+            });
+
+            function activateMessages(){
+                const synth = window.speechSynthesis;
+                const utterThis = new SpeechSynthesisUtterance("Mensajes de voz activados.");
+                synth.speak(utterThis);
+            }
+
+        </script>
+    </body>
+</html>

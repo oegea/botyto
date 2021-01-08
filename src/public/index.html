@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>It works!</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
+        <link href="assets/styles/main.css" rel="stylesheet">
+    </head>
+    <body>
+        <img class="window-left" src="assets/img/left-corner.png" />
+        <img class="window-right" src="assets/img/right-corner.png" />
+        <img id="poring" class="poring" src="assets/img/poring.gif" />
+        <h1></h1>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            let timeout;
+            var socket = io();
+            socket.on('message', (msg) => {
+                playMessage(msg, 'poring.gif', 'alert.mp3');
+            });
+
+            socket.on('watermessage', (msg) =>{
+                playMessage(msg, 'blueporing.gif', 'water.mp3');
+            });
+
+            socket.on('trumpet', (msg) => {
+                playMessage(msg, 'poring.gif', 'trumpet.mp3');
+            });
+
+            socket.on('saymessage', (msg)=>{
+                const synth = window.speechSynthesis;
+                const utterThis = new SpeechSynthesisUtterance(msg);
+                synth.speak(utterThis);
+            });
+
+            function playMessage(msg, img, sound){
+
+                if (img === undefined){
+                    img = 'poring.gif';
+                }
+
+                if (timeout !== undefined){
+                    window.clearTimeout(timeout);
+                }
+
+                document.getElementsByTagName("body")[0].style.display = "block";
+                document.getElementsByTagName("h1")[0].innerText = msg;
+                document.getElementById('poring').src = 'assets/img/'+img;
+                if (sound !== undefined){
+                    const audio = new Audio('assets/sounds/'+sound);
+                    audio.play();
+                }
+
+
+                timeout = setTimeout(() => { 
+                    document.getElementsByTagName("body")[0].style.display = "none";
+                    document.getElementsByTagName("h1")[0].innerText = '';
+                }, 10000);
+            }
+        </script>
+    </body>
+</html>
