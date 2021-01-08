@@ -27,6 +27,6 @@ This will show visual alerts to your stream when someone uses botyto interactity
 
 Visual alerts are displayed using a very basic frontend (believe me, it's very, very basic). Frontend app receives sockets when is the moment to show alerts, so its customization can be achieved editing the web application container inside the `public` directory.
 
-# Hey! Commands are in Spanish.
+# Hey! Commands are in Spanish
 
 Yes. Apologies but Botyto doesn't have a i18n system. TIt's a very basic ElectronJS application specifically written for a Spanish Twitch channel. Fortunatelly is basic enought to easilly translate commands to the English language, and even allow to configure them from the configuration dialog.
