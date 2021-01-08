@@ -1,6 +1,8 @@
 # botyto
 Botyto is a Twitch chatbot for those users that have not reached yet the affiliate level. Botyto is GDPR compliant, usernames are always hashed before saving them on the local database.
 
+** Disclaimer: I'm a personal project developed during a *weekend*. Best practices weren't a must. **
+
 # Setting up the environment
 
 Use the `yarn` command to install all required dependencies.
