@@ -27,6 +27,10 @@
                 playMessage(msg, 'poring.gif', 'trumpet.mp3');
             });
 
+            socket.on('customMessage', (msg, image, sound)=> {
+                playMessage(msg, image, sound);
+            });
+
             socket.on('saymessage', (msg)=>{
                 const synth = window.speechSynthesis;
                 const utterThis = new SpeechSynthesisUtterance(msg);
@@ -42,12 +46,21 @@
                 if (timeout !== undefined){
                     window.clearTimeout(timeout);
                 }
-
+                
+                if (!img.includes('http://') && !img.includes('https://') && !img.includes('file://')){
+                    img = 'assets/img/'+img;
+                }
+                
                 document.getElementsByTagName("body")[0].style.display = "block";
                 document.getElementsByTagName("h1")[0].innerText = msg;
-                document.getElementById('poring').src = 'assets/img/'+img;
-                if (sound !== undefined){
-                    const audio = new Audio('assets/sounds/'+sound);
+                document.getElementById('poring').src = img;
+                if (sound !== undefined && sound.length > 0){
+                    
+                    if (!sound.includes('http://') && !sound.includes('https://') && !sound.includes('file://')){
+                        sound = 'assets/sounds/'+sound;
+                    }
+                    
+                    const audio = new Audio(sound);
                     audio.play();
                 }
 

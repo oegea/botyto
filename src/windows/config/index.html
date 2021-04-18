@@ -8,20 +8,35 @@
   </head>
   <body>
     <h1>Configuration</h1>
-    
+    <h3>Login and channel</h3>
+    <label for="username">Username</label>
     <input type="text" id="username" placeholder="Username"/>
+    <label for="password">OAuth Token</label>
     <input type="text" id="password" placeholder="Oauth Token"/>
     <p><a target="blank" href="https://twitchapps.com/tmi/">You can get your OAuth Token clicking here.</a></p>
+    <label for="channelName">Channel Name</label>
     <input type="text" id="channelName" placeholder="Channel Name"/>
+    <h3>Points</h3>
+    <label for="pointName">Points Name</label>
     <input type="text" id="pointName" placeholder="Points Name"/>
+    <label for="pointsPerMinute">Points per minute</label>
     <input type="number" min="0" id="pointsPerMinute" placeholder="Points per minute"/>
+    <label for="pointsInterval">Points interval (minutes)</label>
     <input type="number" min="1" id="pointsInterval" placeholder="Points interval (minutes)"/>
+    <h3>Administration</h3>
+    <label for="adminName">Admin username</label>
     <input type="text" id="adminName" placeholder="Admin username"/>
-    <input type="text" id="donorText" placeholder="Donor text"/>
-    <input type="text" id="networkText" placeholder="Social Networks text"/>
-    <input type="number" min="0" id="hidratacionCost" placeholder="!hidratacion cost"/>
+    <h3>Standard commands cost</h3>
+    <label for="messageCost">!mensaje cost</label>
     <input type="number" min="0" id="messageCost" placeholder="!mensaje cost"/>
-    <input type="number" min="0" id="dadoCost" placeholder="!dado cost"/>
+    <h3>Custom Commands</h3>
+    <div id="commands-wrapper">
+
+    </div>
+
+    <div class="button bottom-button" onclick="createCommand()">
+      New Command
+    </div>
     <div class="buttons-wrapper">
       <div class="button bottom-button float-left" onclick="save()">
         Save

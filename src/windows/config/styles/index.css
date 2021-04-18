@@ -55,7 +55,7 @@ p{
   text-align: center;
 }
 
-input[type='text'],input[type='number']{
+input[type='text'],input[type='number'],select, textarea{
   padding: 12px;
   border-top: 0;
   border-left: 0;
@@ -63,13 +63,45 @@ input[type='text'],input[type='number']{
   border-bottom: 2px solid #FDBC16;
   color: black;
   width: calc(100% - 2rem);
+  margin-bottom: 10px;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
 }
 
-input[type='text']:focus,input[type='number']:focus { /* Chrome, Firefox, Opera, Safari 10.1+ */
+select{
+  width: calc(100% - 0.5rem);
+  padding: 8px;
+}
+
+input[type='text']:focus,input[type='number']:focus, select:focus, textarea:focus { /* Chrome, Firefox, Opera, Safari 10.1+ */
   outline: none;
 }
 
-input[type='text']::placeholder,input[type='number']::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+input[type='text']::placeholder,input[type='number']::placeholder,select::placeholder, textarea::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: black;
   opacity: 1; /* Firefox */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+}
+
+/** Custom Commands **/
+div.custom-command-wrapper{
+  background: #f1f1f1; 
+  padding: 17px;
+  margin-bottom: 10px;
+}
+
+input.custom-command-cost {
+  margin-bottom: 16px;
+}
+
+input[type='checkbox']{
+  margin-right: 10px;
+}
+
+label {
+  font-weight: bold;
+  font-size: 12px;
+  margin-left: 2px;
 }

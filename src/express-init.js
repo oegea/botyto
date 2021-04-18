@@ -27,6 +27,10 @@ class ExpressInit {
             res.sendFile(__dirname + '/public/voice.html');
         });
 
+        app.get('/window.html', (req, res) => {
+            res.sendFile(__dirname + '/public/window.html');
+        });
+
         app.use('/assets/', express.static(__dirname + '/public/assets') );
 
         //Sockets

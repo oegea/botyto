@@ -12,6 +12,7 @@ class TwitchInit {
      */
     constructor(express, storage, config, logger){
         //Propiedades
+        this.robot = require('robotjs');
         this.express = express;
         this.config = config;
         this.storage = storage;
@@ -25,6 +26,9 @@ class TwitchInit {
             cost: 0,
             participants: []
         }
+
+        this.chatPlay = false;
+        this.chatPlayer = '';
 
         //Carga de dependencias de terceros
         const tmi = require('tmi.js');
@@ -81,18 +85,34 @@ class TwitchInit {
         // If the command is known, let's execute it
         switch(commandName){
             default:
+                this.execCustomCommand(target, context, msg, self, commandName, username);
                 break;
             
-            case '!ayuda':
-                this.client.say(target, `Comandos disponibles: !ayuda, !puntos, !sorteo, !hidratacion, !mensaje, !dado, !quehaces, !donar, !redes.`);
+            case '!ayuda':    
+                let customCommands = '';
+                for (let command of this.config.customCommands){
+                    if (!command.isAdminCommand)
+                        customCommands += ', '+command.label;
+                }
+                    
+                this.client.say(target, `Comandos disponibles: !ayuda, !puntos, !sorteo, !mensaje, !quehaces${customCommands}.`);
+                break;
+
+            case '!admin':
+                if (this._checkAdmin(target, username) === false)
+                    return;
+
+                let adminCustomCommands = '';
+                for (let command of this.config.customCommands){
+                    if (command.isAdminCommand)
+                        adminCustomCommands += ', '+command.label;
+                }
+                
+                this.client.say(target, `Comandos disponibles: !chatplay, !darpuntos, !quehago, !hazsorteo, !sorteo, !terminasorteo${adminCustomCommands}.`);
                 break;
 
             case '!puntos':
                 await this.execPuntos(target, username);
-                break;
-
-            case '!hidratacion':
-                await this.execHidratacion(target, username);
                 break;
 
             case '!mensaje':
@@ -103,23 +123,16 @@ class TwitchInit {
                 await this.execQueHaces(target, username);
                 break;
 
-            case '!donar':
-                this.client.say(target, this.config.donorText);
-                break;
-
-            case '!redes':
-                this.client.say(target, this.config.networkText);
-                break;
-            
-            case '!dado':
-                await this.execDado(target, username);
-                break;
-
             case '!sorteo':
                 await this.execSorteo(target, username);
                 break;
 
             /* COMANDOS ADMIN */
+
+            case '!chatplay':
+                await this.execChatPlay(target, username, msg);
+                break;
+
             case '!darpuntos':
                 await this.execDarPuntos(target, username, msg);
                 break;
@@ -135,6 +148,65 @@ class TwitchInit {
             case '!terminasorteo':
                 await this.execTerminaSorteo(target, username, msg);
                 break;
+        }
+    }
+
+    /**
+     * Ejecuta un comando personalizado propio
+     */
+    async execCustomCommand(target, context, msg, self, commandName, username){
+        //Iteramos comandos
+        for (let customCommand of this.config.customCommands){
+            //Si tenemos el comando
+            if (customCommand.label === commandName){
+                //Sólo admins
+                if (customCommand.isAdminCommand && this._checkAdmin(target, username) === false)
+                    return;
+
+                //Si es press key, debe estar chat play
+                if (customCommand.action === 'KEY' && this._checkChatPlay(target, username) === false)
+                    return;    
+
+                //Cobramos
+                const applyResult = await this._applyCommandCost(customCommand.cost, target, username);
+                if (applyResult === false)
+                    return;
+
+                //Reemplazamos variables
+                let messageToSend = customCommand.message;
+                //[username]
+                messageToSend = messageToSend.replaceAll('[username]', username);
+                //[rand(x:y)]
+                let randSplittedMessage = messageToSend.split('[rand(');
+                if (randSplittedMessage.length > 1){
+                    randSplittedMessage[1] = randSplittedMessage[1].split(')]');
+                    
+                    randSplittedMessage[1][0] = randSplittedMessage[1][0].split(':');
+                    
+                    let min = parseInt(randSplittedMessage[1][0][0]);
+                    let max = parseInt(randSplittedMessage[1][0][1]);
+                    
+                    let result  = this.getRandomInt(min, max);
+                    const additionalText  =  (randSplittedMessage[1].length > 1)?randSplittedMessage[1][1]:'';
+                    randSplittedMessage[1] = result + additionalText;
+                    
+                    messageToSend = randSplittedMessage.join(' ');
+                }
+                
+                if (customCommand.action === 'KEY'){
+                    this._keyTap(target, username, messageToSend, msg);
+                }
+
+                if (customCommand.action === 'VIDEO' ||customCommand.action === 'CHAT'){
+                    this.client.say(target, messageToSend);
+                }
+
+                if (customCommand.action === 'VIDEO'){
+                    this.express.io.emit('customMessage', messageToSend, customCommand.videoImage, customCommand.videoSound);
+                }
+
+                break;
+            }
         }
     }
 
@@ -244,6 +316,42 @@ class TwitchInit {
     }
 
     /**
+     * Habilitamos o deshabilitamos el modo de juego por chat
+     */
+    async execChatPlay(target, username, msg){
+        if (this._checkAdmin(target, username) === false)
+            return;
+
+        let customCommands = '';
+        for (let command of this.config.customCommands){
+            if (!command.isAdminCommand && command.action === 'KEY')
+                customCommands += ((customCommands.length === 0)?'':', ')+command.label;
+        }
+
+
+        //Mod: Para poder autorizar a jugadores concretos
+        let authorizedPlayer = msg.replace(`!chatplay`, '');
+        if (authorizedPlayer !== ''){
+            this.chatPlayer = authorizedPlayer;
+        } else{
+            this.chatPlayer = '';
+        }
+
+        if (this.chatPlayer === ''){
+            this.chatPlay = !this.chatPlay;
+
+            if (this.chatPlay === true)
+                this.client.say(target, `Empieza el modo de juego por chat. Usad ${customCommands}.`);
+            else
+                this.client.say(target, 'El modo de juego por chat ha sido deshabilitado.');
+        } else{
+            this.client.say(target, `El modo de juego por chat está activado para ${authorizedPlayer}. Usa ${customCommands}.`);
+        }
+
+
+    }
+
+    /**
      * Damos puntos a un usuario
      */
     async execDarPuntos(target, username, msg){
@@ -265,18 +373,6 @@ class TwitchInit {
     }
 
     /**
-     * Hidrata al stramer con el comando !hidratacion
-     */
-    async execHidratacion(target, username){
-        const applyResult = await this._applyCommandCost(30, target, username);
-        if (applyResult === false)
-            return;
-            
-        this.client.say(target, `¡${username} cree que es hora de hidratarse!`);
-        this.express.io.emit('watermessage', `¡${username} cree que es hora de hidratarse!`);
-    }
-
-    /**
      * Envía un mensaje en voz alta
      */
     async execMensaje(target, username, msg){
@@ -288,24 +384,11 @@ class TwitchInit {
             return;
         }
 
-        const applyResult = await this._applyCommandCost(30, target, username);
+        const applyResult = await this._applyCommandCost(this.config.messageCost, target, username);
         if (applyResult === false)
             return;
             
         this.express.io.emit('saymessage', message);
-    }
-
-    /**
-     * Lanza un dado con el comando !dado
-     */
-    async execDado(target, username){
-        const applyResult = await this._applyCommandCost(10, target, username);
-        if (applyResult === false)
-            return;
-
-        const num = this.getRandomInt(1, 6);
-        this.client.say(target, `¡${username} ha lanzado un dado y ha obtenido un ${num}!`);
-        this.express.io.emit('message', `¡${username} ha lanzado un dado y ha obtenido un ${num}!`);
     }
 
     /**
@@ -314,6 +397,51 @@ class TwitchInit {
     async execPuntos(target, username){
         const pointsNumber = await this.users.getPoints(username);
         this.client.say(target, `${username} tiene ${pointsNumber} ${this.config.pointName}`);
+    }
+
+    /**
+     * Ejecuta un comando para pulsar una tecla, considerando cuántas veces debe pulsarse la tecla
+     */
+    _keyTap(target, username, key, msg){
+        //El chat play debe estar habilitado
+        if (this._checkChatPlay(target, username) === false)
+            return;
+
+        // Requerimos dependencias
+        var robot = this.robot;   
+
+        let countParams = msg.replace(`!${key}`, '');
+        let count = 1;
+        if (!isNaN(parseInt(countParams))){
+            count = parseInt(countParams);
+        }
+
+        //Límite
+        if (count > 30)
+            count = 30;
+
+        for (let i = 1; i <= count; i++)
+            robot.keyTap(key);
+        
+        return;
+    }
+
+
+    /**
+     * Comprueba si podemos ejecutar comandos de chatplay
+     */
+    _checkChatPlay(target, username){
+        if (!this.chatPlay){
+            this.client.say(target, `El modo de juego por chat no está habilitado actualmente.`);
+            return false;
+        }
+
+        if (this.chatPlayer !== '' && this.chatPlayer !== username){
+            this.client.say(target, `Actualmente sólo ${this.chatPlayer} puede participar en el juego por chat.`);
+            return false;
+        }
+
+        return true;
     }
 
     /**
